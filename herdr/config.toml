@@ -1,0 +1,11 @@
+onboarding = false
+
+[keys]
+prefix = "ctrl+w"
+split_vertical = "prefix+/"
+split_horizontal = "prefix+-"
+copy_mode = "prefix+v"
+goto = "prefix+w"
+
+[ui]
+prompt_new_tab_name = false

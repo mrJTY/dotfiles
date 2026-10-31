@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+
+# Hyprland-style mouse interaction: hold alt and drag with one mouse button
+# to move a window, the other to resize it (Hyprland: mainMod + left-drag =
+# movewindow, mainMod + right-drag = resizewindow).
+yabai -m config mouse_modifier alt
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
+
+# Hyprland always auto-tiles new windows; make bsp the explicit default here
+# too, rather than relying on yabai's own default.
+yabai -m config layout bsp
+
+# Gaps between/around tiled windows (Hyprland: gaps_in/gaps_out).
+yabai -m config window_gap 10
+yabai -m config top_padding 10
+yabai -m config bottom_padding 10
+yabai -m config left_padding 10
+yabai -m config right_padding 10
+
+# Hyprland's default has focus follow the mouse pointer.
+yabai -m config focus_follows_mouse autofocus
+
+# ...and the reverse: when focus changes (e.g. via the alt-hjkl keyboard
+# binds), warp the pointer to the newly focused window. yabai's docs note
+# running both of these at once can fight itself in some setups — revisit
+# if focus starts feeling jumpy.
+yabai -m config mouse_follows_focus on
+
+# Leave these apps floating instead of tiled.
+yabai -m rule --add app="^Stickies$" manage=off
+# yabai -m rule --add app="^iTerm2$" manage=off
+
+echo "yabai configuration loaded.."
