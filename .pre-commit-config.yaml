@@ -1,0 +1,29 @@
+# Runs the same tools as bin/lint.sh, from the system PATH (bin/install.sh installs them).
+# Enable with: pre-commit install   (bin/install.sh does this)
+default_install_hook_types: [pre-commit, pre-push]
+repos:
+  - repo: local
+    hooks:
+      - id: gitleaks
+        name: gitleaks (staged changes)
+        entry: gitleaks git --pre-commit --staged --redact --no-banner
+        language: system
+        pass_filenames: false
+      - id: shellcheck
+        name: shellcheck
+        entry: shellcheck
+        language: system
+        files: \.sh$
+        exclude: ^archive/
+      - id: editorconfig-checker
+        name: editorconfig-checker
+        entry: editorconfig-checker
+        language: system
+        exclude: ^archive/
+      - id: check
+        name: bin/lint.sh (full)
+        entry: bin/lint.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
