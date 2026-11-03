@@ -18,6 +18,6 @@ install_pkgs() {
 }
 
 case "$(uname -s)" in
-  Darwin) install_pkgs neovim ripgrep ;;  # make/clang come with Xcode CLT
-  *) install_pkgs neovim ripgrep git make gcc ;;
+  Darwin) install_pkgs neovim ripgrep tree-sitter-cli ;;  # make/clang come with Xcode CLT
+  *) install_pkgs neovim ripgrep git make gcc tree-sitter-cli ;;
 esac
