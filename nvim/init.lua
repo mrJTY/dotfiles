@@ -203,8 +203,8 @@ require("lazy").setup({
           filtered_items = {
             visible = false,
             hide_dotfiles = false,
-            hide_gitignored = true,
-            hide_hidden = true,
+            hide_gitignored = false,
+            hide_hidden = false,
             hide_by_name = {
               ".DS_Store",
               "thumbs.db"
@@ -272,12 +272,17 @@ require("lazy").setup({
     config = function()
       require('telescope').setup {
         defaults = {
+          file_ignore_patterns = { "^%.git/", "%.DS_Store" },
           mappings = {
             i = {
               ['<C-u>'] = false,
               ['<C-d>'] = false,
             },
           },
+        },
+        pickers = {
+          -- show dotfiles and gitignored files (.git/ is excluded above)
+          find_files = { hidden = true, no_ignore = true },
         },
       }
 
@@ -346,6 +351,25 @@ require("lazy").setup({
     },
   },
 
+  -- Minimap (toggle with <leader>tm)
+  {
+    'echasnovski/mini.map',
+    version = false,
+    config = function()
+      local map = require('mini.map')
+      map.setup({
+        integrations = {
+          map.gen_integration.builtin_search(),
+          map.gen_integration.diagnostic(),
+          map.gen_integration.gitsigns(),
+        },
+        symbols = { encode = map.gen_encode_symbols.dot('4x2') },
+        window = { show_integration_count = false, width = 12 },
+      })
+      map.open()
+    end,
+  },
+
   -- Status line
   {
     'nvim-lualine/lualine.nvim',
@@ -379,6 +403,18 @@ wk.add({
       print("Copied: " .. path)
     end,
     desc = "Copy File Path",
+  },
+  {
+    "<leader>fn",
+    function()
+      vim.ui.input({ prompt = "New file: ", completion = "file" }, function(name)
+        if not name or name == "" then return end
+        name = vim.fn.expand(name)
+        vim.fn.mkdir(vim.fn.fnamemodify(name, ":h"), "p")
+        vim.cmd("edit " .. vim.fn.fnameescape(name))
+      end)
+    end,
+    desc = "New File",
   },
   { "<leader>ft", "<cmd>Neotree toggle<cr>", desc = "Toggle File Tree" },
   { "<leader>fT", "<cmd>Neotree focus<cr>", desc = "Focus File Tree" },
@@ -458,6 +494,7 @@ wk.add({
   { "<leader>hm", "<cmd>Telescope man_pages<cr>", desc = "Man Pages" },
   { "<leader>hc", "<cmd>Telescope commands<cr>", desc = "Commands" },
   { "<leader>Q", "<cmd>qa<cr>", desc = "Quit Neovim" },
+  { "<leader>fx", "<cmd>qa<cr>", desc = "Quit Neovim" },
   { "<leader>q", group = "Quit" },
   { "<leader>qq", "<cmd>q<cr>", desc = "Quit" },
   { "<leader>qQ", "<cmd>q!<cr>", desc = "Force Quit" },
@@ -469,6 +506,7 @@ wk.add({
 -- Toggle operations (SPC t)
 wk.add({
   { "<leader>t", group = "Toggle" },
+  { "<leader>tm", function() require("mini.map").toggle() end, desc = "Toggle Minimap" },
   { "<leader>tn", "<cmd>set number!<cr>", desc = "Toggle Line Numbers" },
   { "<leader>tr", "<cmd>set relativenumber!<cr>", desc = "Toggle Relative Numbers" },
   { "<leader>tw", "<cmd>set wrap!<cr>", desc = "Toggle Word Wrap" },
@@ -492,6 +530,13 @@ vim.keymap.set({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, si
 -- Quick save with Ctrl+S
 vim.keymap.set('n', '<C-s>', '<cmd>w<cr>', { desc = 'Save file' })
 vim.keymap.set('i', '<C-s>', '<esc><cmd>w<cr>', { desc = 'Save file' })
+
+-- Cmd+V paste. Inside herdr the terminal reports Cmd+V as a <D-v> key event
+-- instead of a bracketed paste, so map it to paste the system clipboard.
+vim.keymap.set({ 'n', 'x' }, '<D-v>', '"+p', { desc = 'Paste from clipboard' })
+vim.keymap.set('i', '<D-v>', '<C-r><C-o>+', { desc = 'Paste from clipboard' })
+vim.keymap.set('c', '<D-v>', '<C-r>+', { desc = 'Paste from clipboard' })
+vim.keymap.set('t', '<D-v>', '<C-\\><C-n>"+pi', { desc = 'Paste from clipboard' })
 
 -- Highlight when yanking text
 vim.api.nvim_create_autocmd('TextYankPost', {
